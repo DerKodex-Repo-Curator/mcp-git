@@ -253,6 +253,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: 'help',
+        description: 'Get comprehensive documentation for all git functions',
+        inputSchema: {
+          type: 'object',
+          properties: {}
+        }
+      }
     ],
   };
 });
@@ -407,6 +415,101 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             type: 'text',
             text: result,
           }],
+        };
+      }
+
+      case 'help': {
+        const helpText = `
+# 🔧 Git MCP Server Help
+
+## Purpose
+Provides comprehensive git version control operations for Claude - status, diff, commit, branch management, and more.
+
+## Available Tools
+
+### git_status
+Get the status of a git repository:
+- **path**: Repository path (defaults to current directory)
+- **short**: Show short format status
+
+### git_diff  
+Show changes in the working directory:
+- **path**: Repository path
+- **staged**: Show staged changes instead of unstaged
+- **file**: Specific file to show diff for
+
+### git_add
+Stage files for commit:
+- **path**: Repository path
+- **files**: Files to stage (use ["."] for all files)
+
+### git_commit
+Create a commit with staged changes:
+- **path**: Repository path  
+- **message**: Commit message (required)
+
+### git_branch
+List, create, or switch branches:
+- **path**: Repository path
+- **action**: list | create | switch | delete (default: list)
+- **name**: Branch name (for create/switch/delete)
+
+### git_log
+Show commit history:
+- **path**: Repository path
+- **limit**: Number of commits to show (default: 10)
+- **oneline**: Show compact one-line format (default: true)
+
+### git_push
+Push commits to remote repository:
+- **path**: Repository path
+- **remote**: Remote name (default: origin)
+- **branch**: Branch to push (defaults to current branch)
+- **force**: Force push (default: false)
+
+### git_pull
+Pull changes from remote repository:
+- **path**: Repository path
+- **remote**: Remote name (default: origin)  
+- **branch**: Branch to pull
+
+### git_clone
+Clone a repository:
+- **url**: Repository URL to clone (required)
+- **path**: Directory to clone into
+- **depth**: Create shallow clone with history truncated
+
+### git_init
+Initialize a new git repository:
+- **path**: Path where to initialize repository
+- **bare**: Create a bare repository (default: false)
+
+## Common Workflows
+
+### Check Status & Stage Changes
+1. git_status - see current state
+2. git_diff - review changes  
+3. git_add - stage files
+4. git_commit - create commit
+
+### Branch Management
+1. git_branch - list branches
+2. git_branch (action: create, name: feature) - create branch
+3. git_branch (action: switch, name: feature) - switch to branch
+
+### Remote Operations
+1. git_pull - get latest changes
+2. git_push - share your commits
+
+## Error Handling
+All operations include comprehensive error handling with descriptive messages.
+Commands are executed in the specified repository path context.
+`;
+        return {
+          content: [{
+            type: 'text',
+            text: helpText
+          }]
         };
       }
 
