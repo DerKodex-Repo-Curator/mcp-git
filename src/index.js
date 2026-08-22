@@ -43,7 +43,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: 'git_status',
-        description: 'Get the status of a git repository',
+        description: 'Status of a repository, as structured output. SCOPE OF THIS WHOLE SERVER, read once: it wraps eleven common git operations and nothing else. Anything past them -- rebase, stash, tag, remote, cherry-pick, reset, blame, worktree, submodules, gh, or any flag these tools do not expose -- needs system_exec running the real git CLI, which also has Mikey\'s SSH keys and credentials. In practice system_exec is what gets used; these are here for when structured output is genuinely easier to act on than parsing text.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -61,7 +61,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_diff',
-        description: 'Show changes in the working directory',
+        description: 'Show unstaged changes, or staged with staged:true, optionally for one file. For anything with a range or a flag (git diff A..B, --stat, --name-only) use system_exec.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -83,7 +83,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_add',
-        description: 'Stage files for commit',
+        description: 'Stage files for commit; pass ["."] for everything. Check what you are staging first -- Mikey keeps cruft out via .gitignore (no __pycache__, *.pyc, *.bak-*, runtime state, ledgers, locks), and staging "." in a repo with a gap in its .gitignore is how that gets committed.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -102,7 +102,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_commit',
-        description: 'Create a commit with staged changes',
+        description: 'Commit what is staged. Standing instruction from Mikey, 2026-06-26: "Always update git. You don\'t need to ask for that." So COMMIT AND PUSH autonomously when work leaves changes -- never surface uncommitted files as a question for him. Write a real message saying what changed and why, not just what.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -120,7 +120,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_branch',
-        description: 'List, create, or switch branches',
+        description: 'List, create, switch, or delete branches. Note his repos are not uniform: mcp-protocols is on master, most others are on main -- check rather than assuming. Merging is not here; that is system_exec.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -143,7 +143,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_log',
-        description: 'Show commit history',
+        description: 'Recent commit history for a repository. Use it to check whether something was ALREADY DONE before redoing it -- several times a stale note claimed work was outstanding that a commit showed finished days earlier. For formatting or filtering (--oneline, --since, -- path) use system_exec.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -166,7 +166,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_push',
-        description: 'Push commits to remote repository',
+        description: 'Push commits to the remote. Part of the same standing instruction as git_commit: push without asking. His remotes are SSH (git@github.com:MikeyBeez/...). ONE EXCEPTION: ~/Code/docs has NO REMOTE ON PURPOSE -- it holds un-anonymized personal material and a pre-push scan guards it. Do not add a remote to that repo; that call is Mikey\'s alone.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -193,7 +193,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_pull',
-        description: 'Pull changes from remote repository',
+        description: 'Pull changes from the remote. Can fail with conflicts or refuse on a dirty tree, and this wrapper cannot resolve either -- when it does, switch to system_exec and handle it with the real CLI rather than retrying.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -215,7 +215,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_clone',
-        description: 'Clone a repository',
+        description: 'Clone a repository. Mikey\'s standing rule for third-party code, 2026-07-28: FORK AND CLONE BEFORE EVALUATING IT -- read the source, do not judge a package from its README or --help. Third-party clones go in ~/Code/third_party. Forking needs gh, which means system_exec.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -237,7 +237,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_init',
-        description: 'Initialize a new git repository',
+        description: 'Initialize a new git repository. Before the first commit, write the .gitignore -- his standard exclusions are __pycache__/, *.pyc, *.bak, *.bak-*, and any runtime state, ledger, or lock files. A repo that will ever hold personal material should also get a pre-push scan (see ~/Code/harness/prepush-scan.sh) rather than a remote.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -255,7 +255,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'git_help',
-        description: 'Get comprehensive documentation for all git functions',
+        description: 'Full documentation for every tool in this server, with examples. Remember it documents these eleven wrappers only, not git itself.',
         inputSchema: {
           type: 'object',
           properties: {}
