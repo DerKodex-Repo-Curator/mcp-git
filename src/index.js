@@ -254,7 +254,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'help',
+        name: 'git_help',
         description: 'Get comprehensive documentation for all git functions',
         inputSchema: {
           type: 'object',
@@ -418,7 +418,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case 'help': {
+      case 'git_help': {
         const helpText = `
 # 🔧 Git MCP Server Help
 
